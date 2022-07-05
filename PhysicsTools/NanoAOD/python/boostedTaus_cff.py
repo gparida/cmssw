@@ -1,20 +1,28 @@
+from tokenize import Double
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import *
 
+from bbtautauAnalysisScripts.electronBoostedTopologyIsoCorrectionTool.electronBoostedTopologyIsoCorrectionTool_cfi import *
+
 ##################### Import reusable funtions and objects from std taus ########
 from PhysicsTools.NanoAOD.taus_cff import _tauId2WPMask,_tauId5WPMask,_tauId7WPMask,tausMCMatchLepTauForTable,tausMCMatchHadTauForTable,tauMCTable
+electronIsoCorrectionTool.boostedTauCollection  = cms.InputTag("finalBoostedTaus")
 
 ##################### User floats producers, selectors ##########################
 
 
 finalBoostedTaus = cms.EDFilter("PATTauRefSelector",
     src = cms.InputTag("slimmedTausBoostedNewID"),
+    #tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
+    #SumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:SumChargedHadronPt"),
     cut = cms.string("pt > 18")
     #cut = cms.string("pt > 40 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBoldDMdR0p3wLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBnewDMwLT2017'))")
 )
 
 boostedTauTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
-    src = cms.InputTag("finalBoostedTaus"),
+    src = cms.InputTag("finalBoostedTaus"), 
+    tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
+    #SumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:SumChargedHadronPt"),
     cut = cms.string(""), #we should not filter on cross linked collections
     name= cms.string("boostedTau"),
     doc = cms.string("slimmedBoostedTaus after basic selection (" + finalBoostedTaus.cut.value()+")"),
@@ -29,7 +37,10 @@ _boostedTauVarsBase = cms.PSet(P4Vars,
        leadTkPtOverTauPt = Var("leadChargedHadrCand.pt/pt ",float, doc="pt of the leading track divided by tau pt",precision=10),
        leadTkDeltaEta = Var("leadChargedHadrCand.eta - eta ",float, doc="eta of the leading track, minus tau eta",precision=8),
        leadTkDeltaPhi = Var("deltaPhi(leadChargedHadrCand.phi, phi) ",float, doc="phi of the leading track, minus tau phi",precision=8),
-
+       ###This is what I am adding
+       tauSumChargedHadronPt = Var("userFloat('tauSumChargedHadronPt')",float,doc="tau pf info"),
+       #SumChargedHadronPt = Var("userFloat('SumChargedHadronPt')",float,doc="photon pf info"), 
+       #####################
        rawIso = Var( "tauID('byCombinedIsolationDeltaBetaCorrRaw3Hits')", float, doc = "combined isolation (deltaBeta corrections)", precision=10),
        rawIsodR03 = Var( "(tauID('chargedIsoPtSumdR03')+max(0.,tauID('neutralIsoPtSumdR03')-0.072*tauID('puCorrPtSum')))", float, doc = "combined isolation (deltaBeta corrections, dR=0.3)", precision=10),
        chargedIso = Var( "tauID('chargedIsoPtSum')", float, doc = "charged isolation", precision=10),
@@ -69,7 +80,8 @@ boostedTauMCTable = tauMCTable.clone(
 )
 
 
-boostedTauSequence = cms.Sequence(finalBoostedTaus)
-boostedTauTables = cms.Sequence(boostedTauTable)
-boostedTauMC = cms.Sequence(boostedTausMCMatchLepTauForTable + boostedTausMCMatchHadTauForTable + boostedTauMCTable)
+boostedTauSequence = cms.Sequence( finalBoostedTaus + electronIsoCorrectionTool )
+#boostedTauIsoSequence = cms.Sequence(electronIsoCorrectionTool)
+boostedTauTables = cms.Sequence( boostedTauTable)
+boostedTauMC = cms.Sequence( boostedTausMCMatchLepTauForTable + boostedTausMCMatchHadTauForTable + boostedTauMCTable)
 
