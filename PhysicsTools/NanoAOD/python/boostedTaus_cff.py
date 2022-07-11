@@ -2,26 +2,68 @@ from tokenize import Double
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import *
 
-from bbtautauAnalysisScripts.electronBoostedTopologyIsoCorrectionTool.electronBoostedTopologyIsoCorrectionTool_cfi import *
+from bbtautauAnalysisScripts.BoostedTauIsoCorrectionTool.BoostedTauIsoCorrectionTool_cfi import *
 
 ##################### Import reusable funtions and objects from std taus ########
 from PhysicsTools.NanoAOD.taus_cff import _tauId2WPMask,_tauId5WPMask,_tauId7WPMask,tausMCMatchLepTauForTable,tausMCMatchHadTauForTable,tauMCTable
-electronIsoCorrectionTool.boostedTauCollection  = cms.InputTag("finalBoostedTaus")
+BoostedTauIsoCorrectionTool.boostedTauCollection  = cms.InputTag("slimmedTausBoostedNewID")
 
 ##################### User floats producers, selectors ##########################
 
 
 finalBoostedTaus = cms.EDFilter("PATTauRefSelector",
-    src = cms.InputTag("slimmedTausBoostedNewID"),
+    src = cms.InputTag("slimmedboostedTauWithUserData"),
     #tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
     #SumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:SumChargedHadronPt"),
     cut = cms.string("pt > 18")
     #cut = cms.string("pt > 40 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBoldDMdR0p3wLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBnewDMwLT2017'))")
 )
 
+slimmedboostedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
+     src = cms.InputTag("slimmedTausBoostedNewID"),
+     userFloats = cms.PSet(
+        ForEtauSumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumChargedHadronPt"),
+        ForEtauSumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumPhotonEt"),
+        ForEtauSumNeutralHadronEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumNeutralHadronEt"),
+        ESumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:ESumChargedHadronPt"),
+        ESumNeutralHadronEt = cms.InputTag("BoostedTauIsoCorrectionTool:ESumNeutralHadronEt"),
+        ESumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:ESumPhotonEt"),
+        Erho = cms.InputTag("BoostedTauIsoCorrectionTool:Erho"),
+        Eea = cms.InputTag("BoostedTauIsoCorrectionTool:Eea"),
+        Ecounter = cms.InputTag("BoostedTauIsoCorrectionTool:Ecounter"),
+        EmatchedPt = cms.InputTag("BoostedTauIsoCorrectionTool:EmatchedPt"),
+        EmatchedEta = cms.InputTag("BoostedTauIsoCorrectionTool:EmatchedEta"),
+        EmatchedPhi = cms.InputTag("BoostedTauIsoCorrectionTool:EmatchedPhi"),
+        EmatchedMass = cms.InputTag("BoostedTauIsoCorrectionTool:EmatchedMass"),
+        ##############################################################################
+        ForMtauSumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:ForMtauSumChargedHadronPt"),
+        ForMtauSumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForMtauSumPhotonEt"),
+        ForMtauSumNeutralHadronEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForMtauSumNeutralHadronEt"),
+        MSumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:MSumChargedHadronPt"),
+        MSumNeutralHadronEt = cms.InputTag("BoostedTauIsoCorrectionTool:MSumNeutralHadronEt"),
+        MSumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:MSumPhotonEt"),
+        MsumPUPt = cms.InputTag("BoostedTauIsoCorrectionTool:MsumPUPt"),
+        Mcounter = cms.InputTag("BoostedTauIsoCorrectionTool:Mcounter"),
+        MmatchedPt = cms.InputTag("BoostedTauIsoCorrectionTool:MmatchedPt"),
+        MmatchedEta = cms.InputTag("BoostedTauIsoCorrectionTool:MmatchedEta"),
+        MmatchedPhi = cms.InputTag("BoostedTauIsoCorrectionTool:MmatchedPhi"),
+        MmatchedMass = cms.InputTag("BoostedTauIsoCorrectionTool:MmatchedMass"),
+
+        #miniIsoChg = cms.InputTag("isoForMu:miniIsoChg"),
+        #miniIsoAll = cms.InputTag("isoForMu:miniIsoAll"),
+        #TauCorrPfIso = cms.InputTag("muonIsoCorrectionTool:TauCorrPfIso"),
+        #ptRatio = cms.InputTag("ptRatioRelForMu:ptRatio"),
+        #ptRel = cms.InputTag("ptRatioRelForMu:ptRel"),
+        #jetNDauChargedMVASel = cms.InputTag("ptRatioRelForMu:jetNDauChargedMVASel"),
+     ),
+     #userCands = cms.PSet(
+        #jetForLepJetVar = cms.InputTag("ptRatioRelForMu:jetForLepJetVar") # warning: Ptr is null if no match is found
+     #),
+)
+
 boostedTauTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
     src = cms.InputTag("finalBoostedTaus"), 
-    tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
+ #       tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
     #SumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:SumChargedHadronPt"),
     cut = cms.string(""), #we should not filter on cross linked collections
     name= cms.string("boostedTau"),
@@ -37,8 +79,34 @@ _boostedTauVarsBase = cms.PSet(P4Vars,
        leadTkPtOverTauPt = Var("leadChargedHadrCand.pt/pt ",float, doc="pt of the leading track divided by tau pt",precision=10),
        leadTkDeltaEta = Var("leadChargedHadrCand.eta - eta ",float, doc="eta of the leading track, minus tau eta",precision=8),
        leadTkDeltaPhi = Var("deltaPhi(leadChargedHadrCand.phi, phi) ",float, doc="phi of the leading track, minus tau phi",precision=8),
-       ###This is what I am adding
-       tauSumChargedHadronPt = Var("userFloat('tauSumChargedHadronPt')",float,doc="tau pf info"),
+       ###This is what I am adding for electron variables
+       ForEtauSumChargedHadronPt = Var("userFloat('ForEtauSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched electron cone"),
+       ForEtauSumPhotonEt = Var("userFloat('ForEtauSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched electron cone"),
+       ForEtauSumNeutralHadronEt = Var("userFloat('ForEtauSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched electron cone"),
+       ESumChargedHadronPt = Var("userFloat('ESumChargedHadronPt')",float,doc="Matched Electron's SumChargedHadronPt"),
+       ESumNeutralHadronEt = Var("userFloat('ESumNeutralHadronEt')",float,doc="Matched Electron's SumNeutralHadronEt"),
+       ESumPhotonEt = Var("userFloat('ESumPhotonEt')",float,doc="Matched Electron's SumPhotonEt"),
+       Erho = Var("userFloat('Erho')",float,doc="Matched Electron's rho"),
+       Eea = Var("userFloat('Eea')",float,doc="Matched Electron's Effective Area"),
+       Ecounter = Var("userInt('Ecounter')",int,doc="Number of electrons that passed the ID and the delta R requirements"),
+       EmatchedPt = Var("userFloat('EmatchedPt')",float,doc="Matched Electron's Pt"),
+       EmatchedEta = Var("userFloat('EmatchedEta')",float,doc="Matched Electron's Eta"),
+       EmatchedPhi = Var("userFloat('EmatchedPhi')",float,doc="Matched Electron's Phi"),
+       EmatchedMass = Var("userFloat('EmatchedMass')",float,doc="Matched Electron's Mass"),
+
+       ###This is what I am adding for muon variables
+       ForMtauSumChargedHadronPt = Var("userFloat('ForMtauSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched muon cone"),
+       ForMtauSumPhotonEt = Var("userFloat('ForMtauSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched muon cone"),
+       ForMtauSumNeutralHadronEt = Var("userFloat('ForMtauSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched muon cone"),
+       MSumChargedHadronPt = Var("userFloat('MSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched muon cone"),
+       MSumNeutralHadronEt = Var("userFloat('MSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched muon cone"),
+       MSumPhotonEt = Var("userFloat('MSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched muon cone"),
+       MsumPUPt = Var("userFloat('MsumPUPt')",float,doc="Tau contamination, sumPUPt,  in the matched muon cone"),
+       Mcounter = Var("userInt('Mcounter')",int,doc="Number of muons that passed the Loose ID and the delta R < 0.4 and > 0.02 requirements"),
+       MmatchedPt = Var("userFloat('MmatchedPt')",float,doc="Matched muon's Pt"),
+       MmatchedEta = Var("userFloat('MmatchedEta')",float,doc="Matched muon's Eta"),
+       MmatchedPhi =  Var("userFloat('MmatchedPhi')",float,doc="Matched muon's Phi"),
+       MmatchedMass = Var("userFloat('MmatchedMass')",float,doc="Matched muon's Mass"),       
        #SumChargedHadronPt = Var("userFloat('SumChargedHadronPt')",float,doc="photon pf info"), 
        #####################
        rawIso = Var( "tauID('byCombinedIsolationDeltaBetaCorrRaw3Hits')", float, doc = "combined isolation (deltaBeta corrections)", precision=10),
@@ -80,7 +148,7 @@ boostedTauMCTable = tauMCTable.clone(
 )
 
 
-boostedTauSequence = cms.Sequence( finalBoostedTaus + electronIsoCorrectionTool )
+boostedTauSequence = cms.Sequence( BoostedTauIsoCorrectionTool + slimmedboostedTauWithUserData + finalBoostedTaus)
 #boostedTauIsoSequence = cms.Sequence(electronIsoCorrectionTool)
 boostedTauTables = cms.Sequence( boostedTauTable)
 boostedTauMC = cms.Sequence( boostedTausMCMatchLepTauForTable + boostedTausMCMatchHadTauForTable + boostedTauMCTable)

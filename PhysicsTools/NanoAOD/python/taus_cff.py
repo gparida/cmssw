@@ -7,15 +7,63 @@ from PhysicsTools.JetMCAlgos.TauGenJetsDecayModeSelectorAllHadrons_cfi import ta
 ##################### Updated tau collection with MVA-based tau-Ids rerun #######
 # Used only in some eras
 from PhysicsTools.NanoAOD.taus_updatedMVAIds_cff import *
+from bbtautauAnalysisScripts.TauIsoCorrectionTool.TauIsoCorrectionTool_cfi import *
+TauIsoCorrectionTool.TauCollection  = cms.InputTag("slimmedTausUpdated")
 
 ##################### User floats producers, selectors ##########################
 
 
 finalTaus = cms.EDFilter("PATTauRefSelector",
-    src = cms.InputTag("slimmedTausUpdated"),
+    src = cms.InputTag("slimmedTauWithUserData"),
     cut = cms.string("pt > 18")
     #cut = cms.string("pt > 18 && tauID('decayModeFindingNewDMs') && (tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits') || (tauID('chargedIsoPtSumdR03')+max(0.,tauID('neutralIsoPtSumdR03')-0.072*tauID('puCorrPtSum'))<2.5) || tauID('byVVVLooseDeepTau2017v2p1VSjet'))")
 )
+
+slimmedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
+     src = cms.InputTag("slimmedTausUpdated"),
+     userFloats = cms.PSet(
+        ForEtauSumChargedHadronPt = cms.InputTag("TauIsoCorrectionTool:ForEtauSumChargedHadronPt"),
+        ForEtauSumPhotonEt = cms.InputTag("TauIsoCorrectionTool:ForEtauSumPhotonEt"),
+        ForEtauSumNeutralHadronEt = cms.InputTag("TauIsoCorrectionTool:ForEtauSumNeutralHadronEt"),
+        ESumChargedHadronPt = cms.InputTag("TauIsoCorrectionTool:ESumChargedHadronPt"),
+        ESumNeutralHadronEt = cms.InputTag("TauIsoCorrectionTool:ESumNeutralHadronEt"),
+        ESumPhotonEt = cms.InputTag("TauIsoCorrectionTool:ESumPhotonEt"),
+        Erho = cms.InputTag("TauIsoCorrectionTool:Erho"),
+        Eea = cms.InputTag("TauIsoCorrectionTool:Eea"),
+        Ecounter = cms.InputTag("TauIsoCorrectionTool:Ecounter"),
+        EmatchedPt = cms.InputTag("TauIsoCorrectionTool:EmatchedPt"),
+        EmatchedEta = cms.InputTag("TauIsoCorrectionTool:EmatchedEta"),
+        EmatchedPhi = cms.InputTag("TauIsoCorrectionTool:EmatchedPhi"),
+        EmatchedMass = cms.InputTag("TauIsoCorrectionTool:EmatchedMass"),
+        ##############################################################################
+        ForMtauSumChargedHadronPt = cms.InputTag("TauIsoCorrectionTool:ForMtauSumChargedHadronPt"),
+        ForMtauSumPhotonEt = cms.InputTag("TauIsoCorrectionTool:ForMtauSumPhotonEt"),
+        ForMtauSumNeutralHadronEt = cms.InputTag("TauIsoCorrectionTool:ForMtauSumNeutralHadronEt"),
+        MSumChargedHadronPt = cms.InputTag("TauIsoCorrectionTool:MSumChargedHadronPt"),
+        MSumNeutralHadronEt = cms.InputTag("TauIsoCorrectionTool:MSumNeutralHadronEt"),
+        MSumPhotonEt = cms.InputTag("TauIsoCorrectionTool:MSumPhotonEt"),
+        MsumPUPt = cms.InputTag("TauIsoCorrectionTool:MsumPUPt"),
+        Mcounter = cms.InputTag("TauIsoCorrectionTool:Mcounter"),
+        MmatchedPt = cms.InputTag("TauIsoCorrectionTool:MmatchedPt"),
+        MmatchedEta = cms.InputTag("TauIsoCorrectionTool:MmatchedEta"),
+        MmatchedPhi = cms.InputTag("TauIsoCorrectionTool:MmatchedPhi"),
+        MmatchedMass = cms.InputTag("TauIsoCorrectionTool:MmatchedMass"),
+
+        #miniIsoChg = cms.InputTag("isoForMu:miniIsoChg"),
+        #miniIsoAll = cms.InputTag("isoForMu:miniIsoAll"),
+        #TauCorrPfIso = cms.InputTag("muonIsoCorrectionTool:TauCorrPfIso"),
+        #ptRatio = cms.InputTag("ptRatioRelForMu:ptRatio"),
+        #ptRel = cms.InputTag("ptRatioRelForMu:ptRel"),
+        #jetNDauChargedMVASel = cms.InputTag("ptRatioRelForMu:jetNDauChargedMVASel"),
+     ),
+     #userCands = cms.PSet(
+        #jetForLepJetVar = cms.InputTag("ptRatioRelForMu:jetForLepJetVar") # warning: Ptr is null if no match is found
+     #),
+)
+
+
+
+
 
 for era in [run2_nanoAOD_94XMiniAODv2, run2_nanoAOD_94X2016, run2_nanoAOD_102Xv1, run2_nanoAOD_106Xv1]:
     era.toModify(finalTaus,
@@ -73,6 +121,35 @@ _tauVarsBase = cms.PSet(P4Vars,
 
        dxy = Var("leadChargedHadrCand().dxy()",float, doc="d_{xy} of lead track with respect to PV, in cm (with sign)",precision=10),
        dz = Var("leadChargedHadrCand().dz()",float, doc="d_{z} of lead track with respect to PV, in cm (with sign)",precision=14),
+
+       ###This is what I am adding for electron variables
+       ForEtauSumChargedHadronPt = Var("userFloat('ForEtauSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched electron cone"),
+       ForEtauSumPhotonEt = Var("userFloat('ForEtauSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched electron cone"),
+       ForEtauSumNeutralHadronEt = Var("userFloat('ForEtauSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched electron cone"),
+       ESumChargedHadronPt = Var("userFloat('ESumChargedHadronPt')",float,doc="Matched Electron's SumChargedHadronPt"),
+       ESumNeutralHadronEt = Var("userFloat('ESumNeutralHadronEt')",float,doc="Matched Electron's SumNeutralHadronEt"),
+       ESumPhotonEt = Var("userFloat('ESumPhotonEt')",float,doc="Matched Electron's SumPhotonEt"),
+       Erho = Var("userFloat('Erho')",float,doc="Matched Electron's rho"),
+       Eea = Var("userFloat('Eea')",float,doc="Matched Electron's Effective Area"),
+       Ecounter = Var("userInt('Ecounter')",int,doc="Number of electrons that passed the ID and the delta R requirements"),
+       EmatchedPt = Var("userFloat('EmatchedPt')",float,doc="Matched Electron's Pt"),
+       EmatchedEta = Var("userFloat('EmatchedEta')",float,doc="Matched Electron's Eta"),
+       EmatchedPhi = Var("userFloat('EmatchedPhi')",float,doc="Matched Electron's Phi"),
+       EmatchedMass = Var("userFloat('EmatchedMass')",float,doc="Matched Electron's Mass"),
+
+       ###This is what I am adding for muon variables
+       ForMtauSumChargedHadronPt = Var("userFloat('ForMtauSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched muon cone"),
+       ForMtauSumPhotonEt = Var("userFloat('ForMtauSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched muon cone"),
+       ForMtauSumNeutralHadronEt = Var("userFloat('ForMtauSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched muon cone"),
+       MSumChargedHadronPt = Var("userFloat('MSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched muon cone"),
+       MSumNeutralHadronEt = Var("userFloat('MSumNeutralHadronEt')",float,doc="Tau contamination, SumNeutralHadronEt,  in the matched muon cone"),
+       MSumPhotonEt = Var("userFloat('MSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched muon cone"),
+       MsumPUPt = Var("userFloat('MsumPUPt')",float,doc="Tau contamination, sumPUPt,  in the matched muon cone"),
+       Mcounter = Var("userInt('Mcounter')",int,doc="Number of muons that passed the Loose ID and the delta R < 0.4 and > 0.02 requirements"),
+       MmatchedPt = Var("userFloat('MmatchedPt')",float,doc="Matched muon's Pt"),
+       MmatchedEta = Var("userFloat('MmatchedEta')",float,doc="Matched muon's Eta"),
+       MmatchedPhi =  Var("userFloat('MmatchedPhi')",float,doc="Matched muon's Phi"),
+       MmatchedMass = Var("userFloat('MmatchedMass')",float,doc="Matched muon's Mass"), 
 
        # these are too many, we may have to suppress some
        rawIso = Var( "tauID('byCombinedIsolationDeltaBetaCorrRaw3Hits')", float, doc = "combined isolation (deltaBeta corrections)", precision=10),
@@ -251,7 +328,7 @@ tauMCTable = cms.EDProducer("CandMCMatchTableProducer",
 )
 
 
-tauSequence = cms.Sequence(patTauMVAIDsSeq + finalTaus)
+tauSequence = cms.Sequence(patTauMVAIDsSeq + TauIsoCorrectionTool + slimmedTauWithUserData + finalTaus)
 _tauSequence80X =  cms.Sequence(finalTaus)
 run2_miniAOD_80XLegacy.toReplaceWith(tauSequence,_tauSequence80X)
 tauTables = cms.Sequence(tauTable)

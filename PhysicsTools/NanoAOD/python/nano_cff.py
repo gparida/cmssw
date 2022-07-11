@@ -161,10 +161,10 @@ def nanoAOD_addBoostedTauIds(process):
                                                      postfix="Boosted",
                                                      toKeep = [ "2017v2", "dR0p32017v2", "newDM2017v2", "againstEle2018",])
     boostedTauIdEmbedder.runTauID()
-    process.boostedTauSequence.insert(process.boostedTauSequence.index(process.finalBoostedTaus),
+    process.boostedTauSequence.insert(0,
                                       process.rerunMvaIsolationSequenceBoosted)
 
-    process.boostedTauSequence.insert(process.boostedTauSequence.index(process.finalBoostedTaus),
+    process.boostedTauSequence.insert(0,
                                       getattr(process, updatedBoostedTauName))
 
     return process
