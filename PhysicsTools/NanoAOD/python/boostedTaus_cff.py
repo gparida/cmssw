@@ -7,6 +7,7 @@ from bbtautauAnalysisScripts.BoostedTauIsoCorrectionTool.BoostedTauIsoCorrection
 ##################### Import reusable funtions and objects from std taus ########
 from PhysicsTools.NanoAOD.taus_cff import _tauId2WPMask,_tauId5WPMask,_tauId7WPMask,tausMCMatchLepTauForTable,tausMCMatchHadTauForTable,tauMCTable
 BoostedTauIsoCorrectionTool.boostedTauCollection  = cms.InputTag("slimmedTausBoostedNewID")
+BoostedTauIsoCorrectionTool.muonCollection  = cms.InputTag("slimmedMuonsUpdated")
 
 ##################### User floats producers, selectors ##########################
 

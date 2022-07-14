@@ -6,6 +6,10 @@ import PhysicsTools.PatAlgos.producersLayer1.electronProducer_cfi
 from math import ceil,log
 
 from RecoEgamma.EgammaTools.egammaObjectModificationsInMiniAOD_cff import egamma8XObjectUpdateModifier,egamma9X105XUpdateModifier,prependEgamma8XObjectUpdateModifier
+
+from bbtautauAnalysisScripts.electronBoostedTopologyIsoCorrectionTool.electronBoostedTopologyIsoCorrectionTool_cfi import *
+electronIsoCorrectionTool.boostedTauCollection = cms.InputTag("slimmedTausBoostedNewID")
+
 ele9X105XUpdateModifier=egamma9X105XUpdateModifier.clone(
     phoPhotonIso = "",
     phoNeutralHadIso = "",
@@ -199,6 +203,7 @@ slimmedElectronsWithUserData = cms.EDProducer("PATElectronUserDataEmbedder",
         PFIsoAll = cms.InputTag("isoForEle:PFIsoAll"),
         PFIsoAll04 = cms.InputTag("isoForEle:PFIsoAll04"),
         ptRatio = cms.InputTag("ptRatioRelForEle:ptRatio"),
+        TauCorrPfIso = cms.InputTag("electronIsoCorrectionTool:TauCorrPfIso"),
         ptRel = cms.InputTag("ptRatioRelForEle:ptRel"),
         jetNDauChargedMVASel = cms.InputTag("ptRatioRelForEle:jetNDauChargedMVASel"),
         ecalTrkEnergyErrPostCorrNew = cms.InputTag("calibratedPatElectronsNano","ecalTrkEnergyErrPostCorr"),
@@ -304,7 +309,8 @@ for modifier in run2_miniAOD_80XLegacy, run2_nanoAOD_94X2016:
 
 finalElectrons = cms.EDFilter("PATElectronRefSelector",
     src = cms.InputTag("slimmedElectronsWithUserData"),
-    cut = cms.string("pt > 5 ")
+    #cut = cms.string("pt > 5 ")
+    cut = cms.string("")
 )
 
 electronMVATTH= cms.EDProducer("EleBaseMVAValueMapProducer",
@@ -373,6 +379,7 @@ electronTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         pfRelIso03_chg = Var("userFloat('PFIsoChg')/pt",float,doc="PF relative isolation dR=0.3, charged component"),
         pfRelIso03_all = Var("userFloat('PFIsoAll')/pt",float,doc="PF relative isolation dR=0.3, total (with rho*EA PU corrections)"),
         jetRelIso = Var("?userCand('jetForLepJetVar').isNonnull()?(1./userFloat('ptRatio'))-1.:userFloat('PFIsoAll04')/pt",float,doc="Relative isolation in matched jet (1/ptRatio-1, pfRelIso04_all if no matched jet)",precision=8),
+        TauCorrPfIso = Var("userFloat('TauCorrPfIso')",float,doc="electron isolation corrected for boosted tau contamination"),
         jetPtRelv2 = Var("?userCand('jetForLepJetVar').isNonnull()?userFloat('ptRel'):0",float,doc="Relative momentum of the lepton with respect to the closest jet after subtracting the lepton",precision=8),
         dr03TkSumPt = Var("?pt>35?dr03TkSumPt():0",float,doc="Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV",precision=8),
         dr03TkSumPtHEEP = Var("?pt>35?dr03TkSumPtHEEP():0",float,doc="Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV used in HEEP ID",precision=8),
@@ -533,7 +540,7 @@ electronMCTable = cms.EDProducer("CandMCMatchTableProducer",
 )
 
 
-electronSequence = cms.Sequence(bitmapVIDForEle + bitmapVIDForEleHEEP + isoForEle + ptRatioRelForEle + seedGainEle + slimmedElectronsWithUserData + finalElectrons)
+electronSequence = cms.Sequence(bitmapVIDForEle + bitmapVIDForEleHEEP + isoForEle + electronIsoCorrectionTool + ptRatioRelForEle + seedGainEle + slimmedElectronsWithUserData + finalElectrons)
 electronTables = cms.Sequence (electronMVATTH + electronTable)
 electronMCold = cms.Sequence(electronsMCMatchForTable + electronMCTable)
 electronMC = cms.Sequence(particleLevelForMatching + tautaggerForMatching + matchingElecPhoton + electronsMCMatchForTable + electronsMCMatchForTableAlt + electronMCTable)
@@ -552,6 +559,7 @@ for modifier in run2_miniAOD_80XLegacy,run2_nanoAOD_94XMiniAODv1,run2_nanoAOD_94
     modifier.toModify(bitmapVIDForEleSum16, src = "slimmedElectronsUpdated")
     modifier.toModify(bitmapVIDForEleHEEP, src = "slimmedElectronsUpdated")
     modifier.toModify(isoForEle, src = "slimmedElectronsUpdated")
+    modifier.toModify(electronIsoCorrectionTool, electronCollection = "slimmedElectronsUpdated")
     modifier.toModify(ptRatioRelForEle, srcLep = "slimmedElectronsUpdated")
     modifier.toModify(seedGainEle, src = "slimmedElectronsUpdated")
     modifier.toModify(slimmedElectronsWithUserData, src = "slimmedElectronsUpdated")

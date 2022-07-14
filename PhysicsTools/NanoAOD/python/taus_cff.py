@@ -9,6 +9,7 @@ from PhysicsTools.JetMCAlgos.TauGenJetsDecayModeSelectorAllHadrons_cfi import ta
 from PhysicsTools.NanoAOD.taus_updatedMVAIds_cff import *
 from bbtautauAnalysisScripts.TauIsoCorrectionTool.TauIsoCorrectionTool_cfi import *
 TauIsoCorrectionTool.TauCollection  = cms.InputTag("slimmedTausUpdated")
+TauIsoCorrectionTool.muonCollection  = cms.InputTag("slimmedMuonsUpdated")
 
 ##################### User floats producers, selectors ##########################
 
