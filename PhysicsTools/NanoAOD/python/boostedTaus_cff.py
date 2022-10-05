@@ -148,6 +148,25 @@ slimmedboostedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
      #),
 )
 
+def _tauIdWPMask(pattern, choices, doc=""):
+    return Var(" + ".join(["%d * tauID('%s')" % (pow(2,i), pattern % c) for (i,c) in enumerate(choices)]), "uint8", 
+               doc=doc+": bitmask "+", ".join(["%d = %s" % (pow(2,i),c) for (i,c) in enumerate(choices)]))
+def _tauId2WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("Loose","Tight"),doc=doc)
+def _tauId3WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("Loose","Medium","Tight"),doc=doc)
+def _tauId4WPMask(pattern,doc):
+    return _tauIdWPMask(pattern, choices=("VLoose", "Loose", "Medium", "Tight"), doc=doc)
+def _tauId5WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("VLoose","Loose","Medium","Tight","VTight"),doc=doc)
+def _tauId6WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("VLoose","Loose","Medium","Tight","VTight","VVTight"),doc=doc)
+def _tauId7WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("VVLoose","VLoose","Loose","Medium","Tight","VTight","VVTight"),doc=doc)
+def _tauId8WPMask(pattern,doc):
+    return _tauIdWPMask(pattern,choices=("VVVLoose","VVLoose","VLoose","Loose","Medium","Tight","VTight","VVTight"),doc=doc)
+
+
 boostedTauTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
     src = cms.InputTag("finalBoostedTaus"), 
  #       tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
@@ -305,7 +324,23 @@ _boostedTauVarsBase = cms.PSet(P4Vars,
        idAntiEle2018 = _tauId5WPMask("againstElectron%sMVA6", doc= "Anti-electron MVA discriminator V6 (2018)"),
 )
 
-boostedTauTable.variables = _boostedTauVarsBase
+_deepTauVars2017v2p1 = cms.PSet(
+    rawDeepTau2017v2p1VSe = Var("tauID('byDeepTau2017v2p1VSeraw')", float, doc="byDeepTau2017v2p1VSe raw output discriminator (deepTau2017v2p1)", precision=10),
+    rawDeepTau2017v2p1VSmu = Var("tauID('byDeepTau2017v2p1VSmuraw')", float, doc="byDeepTau2017v2p1VSmu raw output discriminator (deepTau2017v2p1)", precision=10),
+    rawDeepTau2017v2p1VSjet = Var("tauID('byDeepTau2017v2p1VSjetraw')", float, doc="byDeepTau2017v2p1VSjet raw output discriminator (deepTau2017v2p1)", precision=10),
+    idDeepTau2017v2p1VSe = _tauId8WPMask("by%sDeepTau2017v2p1VSe", doc="byDeepTau2017v2p1VSe ID working points (deepTau2017v2p1)"),
+    idDeepTau2017v2p1VSmu = _tauId4WPMask("by%sDeepTau2017v2p1VSmu", doc="byDeepTau2017v2p1VSmu ID working points (deepTau2017v2p1)"),
+    idDeepTau2017v2p1VSjet = _tauId8WPMask("by%sDeepTau2017v2p1VSjet", doc="byDeepTau2017v2p1VSjet ID working points (deepTau2017v2p1)"),
+)
+
+
+_variablesMiniV2 = cms.PSet(
+    _boostedTauVarsBase,
+    _deepTauVars2017v2p1
+)
+
+#boostedTauTable.variables = _boostedTauVarsBase
+boostedTauTable.variables = _variablesMiniV2
 
 
 boostedTausMCMatchLepTauForTable = tausMCMatchLepTauForTable.clone(
