@@ -23,6 +23,34 @@ from PhysicsTools.NanoAOD.isotracks_cff import *
 from PhysicsTools.NanoAOD.protons_cff import *
 from PhysicsTools.NanoAOD.NanoAODEDMEventContent_cff import *
 
+##########Changes by Ganesh for particleNet###################################
+from bbtautauAnalysisScripts.particleNetForFatJettoTaus.particleNetForFatJettoTaus_cfi import *
+
+#pfParticleNetAK8LastJetTagInfosProducer = pfParticleNetAK8LastJetTagInfos.clone() 
+
+_pnetDiscriminators = [];
+from RecoBTag.ONNXRuntime.boostedJetONNXJetTagsProducer_cfi import boostedJetONNXJetTagsProducer
+pfParticleNetAK8LastJetTags = boostedJetONNXJetTagsProducer.clone();
+pfParticleNetAK8LastJetTags.src = cms.InputTag("pfParticleNetAK8LastJetTagInfos");
+pfParticleNetAK8LastJetTags.flav_names = cms.vstring('probHtt','probHtm','probHte','probHbb','probHcc','probHqq','probHgg','probQCD2hf','probQCD1hf','probQCD0hf','masscorr');
+pfParticleNetAK8LastJetTags.preprocess_json = cms.string('bbtautauAnalysisScripts/particleNetForFatJettoTaus/TrainingNtupleMakerAK8/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/preprocess.json');
+pfParticleNetAK8LastJetTags.model_path = cms.FileInPath('bbtautauAnalysisScripts/particleNetForFatJettoTaus/TrainingNtupleMakerAK8/data/ParticleNetAK8/Puppi/PNETUL/ClassReg/particle-net.onnx');
+_pnetDiscriminators.extend([
+    "pfParticleNetAK8LastJetTags:probHtt",
+    "pfParticleNetAK8LastJetTags:probHtm",
+    "pfParticleNetAK8LastJetTags:probHte",
+    "pfParticleNetAK8LastJetTags:probHbb",
+    "pfParticleNetAK8LastJetTags:probHcc",
+    "pfParticleNetAK8LastJetTags:probHqq",
+    "pfParticleNetAK8LastJetTags:probHgg",
+    "pfParticleNetAK8LastJetTags:probQCD2hf",
+    "pfParticleNetAK8LastJetTags:probQCD1hf",
+    "pfParticleNetAK8LastJetTags:probQCD0hf",
+    "pfParticleNetAK8LastJetTags:masscorr"
+])
+##########Changes by Ganesh for particleNet###################################
+
+
 nanoMetadata = cms.EDProducer("UniqueStringProducer",
     strings = cms.PSet(
         tag = cms.string("untagged"),
@@ -107,12 +135,15 @@ l1bits=cms.EDProducer("L1TriggerResultsConverter", src=cms.InputTag("gtStage2Dig
                       storeUnprefireableBit=cms.bool(True), src_ext=cms.InputTag("gtStage2Digis"))
 (run2_miniAOD_80XLegacy | run2_nanoAOD_94X2016 | run2_nanoAOD_94XMiniAODv1 | run2_nanoAOD_94XMiniAODv2 | run2_nanoAOD_102Xv1).toModify(l1bits, storeUnprefireableBit=False)
 
-nanoSequenceCommon = cms.Sequence(
+
+#Changes added by Ganesh for ParticleNet - Inserting pfParticleNetAK8LastJetTagInfos before jetSequence
+nanoSequenceCommon = cms.Sequence(pfParticleNetAK8LastJetTagInfos +
         nanoMetadata + jetSequence + muonSequence + tauSequence +  boostedTauSequence + electronSequence + lowPtElectronSequence + photonSequence+vertexSequence+
         isoTrackSequence + jetLepSequence + # must be after all the leptons
         linkedObjects  +
         jetTables + muonTables + tauTables + boostedTauTables + electronTables + lowPtElectronTables + photonTables +  globalTables +vertexTables+ metTables+simpleCleanerTable + isoTrackTables
         )
+#Changes added by Ganesh for ParticleNet - Inserting pfParticleNetAK8LastJetTagInfos before jetSequence        
 #remove boosted tau from previous eras
 (run2_miniAOD_80XLegacy | run2_nanoAOD_92X | run2_nanoAOD_94XMiniAODv1 | run2_nanoAOD_94X2016 | run2_nanoAOD_94XMiniAODv2 | run2_nanoAOD_102Xv1 | run2_nanoAOD_106Xv1).toReplaceWith(nanoSequenceCommon, nanoSequenceCommon.copyAndExclude([boostedTauSequence, boostedTauTables]))
 
@@ -313,6 +344,9 @@ def nanoAOD_addDeepInfoAK8(process, addDeepBTag, addDeepBoostedJet, addDeepDoubl
         print("Updating process to run ParticleNet before it's included in MiniAOD")
         from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetJetTagsAll as pfParticleNetJetTagsAll
         _btagDiscriminators += pfParticleNetJetTagsAll
+        ##########Changes by Ganesh for particleNet###################################
+        _btagDiscriminators += _pnetDiscriminators
+        ##########Changes by Ganesh for particleNet###################################
     if addParticleNetMass:
         from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetMassRegressionOutputs
         _btagDiscriminators += _pfParticleNetMassRegressionOutputs

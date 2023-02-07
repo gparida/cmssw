@@ -204,6 +204,14 @@ _tauVarsBase = cms.PSet(P4Vars,
        decayMode = Var("decayMode()",int),
        idDecayModeOldDMs = Var("tauID('decayModeFinding')", bool),
 
+       #Storing the IDs which we may/maynot remove from the base selections of the objects
+       idDecayModeNewDMs = Var("tauID('decayModeFindingNewDMs')",bool,doc="added by gp"),
+       LooseCombinedIsolationDeltaBetaCorr3Hits = Var("tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits')",bool,doc="added by gp"),
+       chargedIsoPtSumdR03 = Var("tauID('chargedIsoPtSumdR03')",float, doc="added by gp, chargedIsoPtSumdR03 stored for applying down the line",precision=10),
+       neutralIsoPtSumdR03 = Var("tauID('neutralIsoPtSumdR03')",float, doc="added by gp, neutralIsoPtSumdR03 stored for applying down the line",precision=10),
+       puCorrPtSum = Var("tauID('puCorrPtSum')",float, doc="added by gp, puCorrPtSum stored for applying down the line",precision=10),
+       VVVLooseDeepTau2017v2p1VSjet = Var("tauID('byVVVLooseDeepTau2017v2p1VSjet')",bool,doc="added by gp"),
+
        leadTkPtOverTauPt = Var("leadChargedHadrCand.pt/pt ",float, doc="pt of the leading track divided by tau pt",precision=10),
        leadTkDeltaEta = Var("leadChargedHadrCand.eta - eta ",float, doc="eta of the leading track, minus tau eta",precision=8),
        leadTkDeltaPhi = Var("deltaPhi(leadChargedHadrCand.phi, phi) ",float, doc="phi of the leading track, minus tau phi",precision=8),

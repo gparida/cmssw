@@ -20,7 +20,7 @@ finalBoostedTaus = cms.EDFilter("PATTauRefSelector",
     src = cms.InputTag("slimmedboostedTauWithUserData"),
     #tauSumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:tauSumChargedHadronPt"),
     #SumChargedHadronPt = cms.InputTag("electronIsoCorrectionTool:SumChargedHadronPt"),
-    cut = cms.string("pt > 18")
+    cut = cms.string("pt > 40")
     #cut = cms.string("pt > 40 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBoldDMdR0p3wLT2017') || tauID('byVVLooseIsolationMVArun2017v2DBnewDMwLT2017'))")
 )
 
@@ -185,6 +185,23 @@ _boostedTauVarsBase = cms.PSet(P4Vars,
        leadTkPtOverTauPt = Var("leadChargedHadrCand.pt/pt ",float, doc="pt of the leading track divided by tau pt",precision=10),
        leadTkDeltaEta = Var("leadChargedHadrCand.eta - eta ",float, doc="eta of the leading track, minus tau eta",precision=8),
        leadTkDeltaPhi = Var("deltaPhi(leadChargedHadrCand.phi, phi) ",float, doc="phi of the leading track, minus tau phi",precision=8),
+
+
+       #Storing the IDs which we may/maynot remove from the base selections of the objects
+       #Copy what is there for taus
+       idDecayModeOldDMs = Var("tauID('decayModeFinding')", bool),
+       idDecayModeNewDMs = Var("tauID('decayModeFindingNewDMs')",bool,doc="added by gp"),
+       LooseCombinedIsolationDeltaBetaCorr3Hits = Var("tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits')",bool,doc="added by gp"),
+       chargedIsoPtSumdR03 = Var("tauID('chargedIsoPtSumdR03')",float, doc="added by gp, chargedIsoPtSumdR03 stored for applying down the line",precision=10),
+       neutralIsoPtSumdR03 = Var("tauID('neutralIsoPtSumdR03')",float, doc="added by gp, neutralIsoPtSumdR03 stored for applying down the line",precision=10),
+       puCorrPtSum = Var("tauID('puCorrPtSum')",float, doc="added by gp, puCorrPtSum stored for applying down the line",precision=10),
+       VVVLooseDeepTau2017v2p1VSjet = Var("tauID('byVVVLooseDeepTau2017v2p1VSjet')",bool,doc="added by gp"),
+
+       #Add what is extra for boosted taus
+       VVLooseIsolationMVArun2017v2DBoldDMwLT2017 = Var("tauID('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017')",bool,doc="added by gp"),
+       VVLooseIsolationMVArun2017v2DBoldDMdR0p3wLT2017 = Var("tauID('byVVLooseIsolationMVArun2017v2DBoldDMdR0p3wLT2017')",bool,doc="added by gp"),
+       VVLooseIsolationMVArun2017v2DBnewDMwLT2017 = Var("tauID('byVVLooseIsolationMVArun2017v2DBnewDMwLT2017')",bool,doc="added by gp"),
+
        ###This is what I am adding for Electron variables
        #ForEtauSumChargedHadronPt = Var("userFloat('ForEtauSumChargedHadronPt')",float,doc="Tau contamination, SumChargedHadronPt,  in the matched electron cone"),
        #ForEtauSumPhotonEt = Var("userFloat('ForEtauSumPhotonEt')",float,doc="Tau contamination, SumPhotonEt,  in the matched electron cone"),
