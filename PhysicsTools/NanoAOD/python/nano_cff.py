@@ -333,6 +333,7 @@ def nanoAOD_activateVID(process):
 
 def nanoAOD_addDeepInfoAK8(process, addDeepBTag, addDeepBoostedJet, addDeepDoubleX, addDeepDoubleXV2, addParticleNet, addParticleNetMass, jecPayload):
     _btagDiscriminators=[]
+    _btagDiscriminators += _pnetDiscriminators
     if addDeepBTag:
         print("Updating process to run DeepCSV btag to AK8 jets")
         _btagDiscriminators += ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probbb']
@@ -345,7 +346,7 @@ def nanoAOD_addDeepInfoAK8(process, addDeepBTag, addDeepBoostedJet, addDeepDoubl
         from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetJetTagsAll as pfParticleNetJetTagsAll
         _btagDiscriminators += pfParticleNetJetTagsAll
         ##########Changes by Ganesh for particleNet###################################
-        _btagDiscriminators += _pnetDiscriminators
+        #_btagDiscriminators += _pnetDiscriminators
         ##########Changes by Ganesh for particleNet###################################
     if addParticleNetMass:
         from RecoBTag.ONNXRuntime.pfParticleNet_cff import _pfParticleNetMassRegressionOutputs
