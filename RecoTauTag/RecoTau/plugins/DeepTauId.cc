@@ -947,7 +947,7 @@ public:
         tauBlockTensor_ = std::make_unique<tensorflow::Tensor>(
             tensorflow::DT_FLOAT, tensorflow::TensorShape{1, TauBlockInputs::NumberOfInputs});
         scalingParamsMap_ = &sc::scalingParamsMap_v2p1;
-      } else if (sub_version_ == 5) {
+      } else if ((sub_version_ == 5) || (sub_version_ == 7)) {
         std::sort(TauBlockInputs::varsToDrop.begin(), TauBlockInputs::varsToDrop.end());
         for (auto v : TauBlockInputs::varsToDrop) {
           tauInputs_indices_.at(v) = -1;  // set index to -1
@@ -961,7 +961,8 @@ public:
                                         static_cast<int>(TauBlockInputs::varsToDrop.size())});
         if (year_ == 2026) {
           scalingParamsMap_ = &sc::scalingParamsMap_PhaseIIv2p5;
-        } else {
+        }else if (sub_version_ == 7){std::cout<<"Pikcking up BoostedTau Params File"<<std::endl; scalingParamsMap_ = &sc::scalingParamsMap_v2p7;} 
+        else {
           scalingParamsMap_ = &sc::scalingParamsMap_v2p5;
         }
       } else
