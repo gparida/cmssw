@@ -6,7 +6,7 @@ from PhysicsTools.NanoAOD.simpleCandidateFlatTableProducer_cfi import simpleCand
 #Ganesh Changes for the private production of NanoAOD
 from bbtautauAnalysisScripts.boostedTauLeadingLeptonIso.boostedTauLeadingLeptonIso_cfi import *
 
-boostedTauLeadingLeptonIso.boostedTauCollection  = cms.InputTag("slimmedTausBoostedNewID")
+boostedTauLeadingLeptonIso.boostedTauCollection  = cms.InputTag("slimmedTausBoosted")
 boostedTauLeadingLeptonIso.muonCollection  = cms.InputTag("slimmedMuonsUpdated")
 from RecoTauTag.RecoTau.tauIdWPsDefs import WORKING_POINTS_v2p7
 #Import from the user defined plugins
@@ -18,7 +18,8 @@ from PhysicsTools.NanoAOD.taus_cff import _tauIdWPMask, tausMCMatchLepTauForTabl
 
 
 finalBoostedTaus = cms.EDFilter("PATTauRefSelector",
-    src = cms.InputTag("slimmedTausBoosted"),
+    #src = cms.InputTag("slimmedTausBoosted"),
+    src = cms.InputTag("slimmedboostedTauWithUserData"),
     #cut = cms.string("pt > 40 && tauID('decayModeFindingNewDMs') && (tauID('byVVLooseIsolationMVArun2DBoldDMwLT') || tauID('byVVLooseIsolationMVArun2DBnewDMwLT'))")
     cut = cms.string("pt > 18")
 )
@@ -31,7 +32,7 @@ run2_nanoAOD_106Xv2.toModify(
 #Changes by Ganesh for Custom nanoAOD production
 
 slimmedboostedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
-     src = cms.InputTag("slimmedTausBoostedNewID"),
+     src = cms.InputTag("slimmedTausBoosted"),
      userFloats = cms.PSet(
         #ForEtauSumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumChargedHadronPt"),
         #ForEtauSumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumPhotonEt"),
