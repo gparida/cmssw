@@ -15,7 +15,7 @@ from PhysicsTools.NanoAOD.taus_updatedMVAIds_cff import *
 #from bbtautauAnalysisScripts.TauIsoCorrectionTool.TauIsoCorrectionTool_cfi import *
 
 from bbtautauAnalysisScripts.TauLeadingLeptonIso.TauLeadingLeptonIso_cfi import *
-TauLeadingLeptonIso.TauCollection  = cms.InputTag("slimmedTaus")
+TauLeadingLeptonIso.TauCollection  = cms.InputTag("slimmedTausUpdated")
 TauLeadingLeptonIso.muonCollection  = cms.InputTag("slimmedMuonsUpdated")
 
 
@@ -39,7 +39,7 @@ run3_nanoAOD_124.toModify(
 )
 
 slimmedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
-     src = cms.InputTag("slimmedTaus"),
+     src = cms.InputTag("slimmedTausUpdated"),
      userFloats = cms.PSet(
         #ForEtauSumChargedHadronPt = cms.InputTag("TauIsoCorrectionTool:ForEtauSumChargedHadronPt"),
         #ForEtauSumPhotonEt = cms.InputTag("TauIsoCorrectionTool:ForEtauSumPhotonEt"),
@@ -445,9 +445,11 @@ tauMCTable = cms.EDProducer("CandMCMatchTableProducer",
 )
 
 
-#tauTask = cms.Task(TauLeadingLeptonIso + slimmedTauWithUserData + finalTaus)
-tauTask = cms.Task(finalTaus)
-tauTablesTask = cms.Task(tauTable)
+#TauSequence = cms.Sequence(TauLeadingLeptonIso + slimmedTauWithUserData + finalTaus)
+tauTask = cms.Task(TauLeadingLeptonIso , slimmedTauWithUserData , finalTaus)
+#tauTask.add(slimmedTauWithUserData)
+#tauTask.add(finalTaus)
+tauTablesTask = cms.Task(TauLeadingLeptonIso, slimmedTauWithUserData, tauTable)
 
 genTauTask = cms.Task(tauGenJetsForNano,tauGenJetsSelectorAllHadronsForNano,genVisTaus,genVisTauTable)
 tauMCTask = cms.Task(genTauTask,tausMCMatchLepTauForTable,tausMCMatchHadTauForTable,tauMCTable)

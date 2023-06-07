@@ -6,7 +6,7 @@ from PhysicsTools.NanoAOD.simpleCandidateFlatTableProducer_cfi import simpleCand
 #Ganesh Changes for the private production of NanoAOD
 from bbtautauAnalysisScripts.boostedTauLeadingLeptonIso.boostedTauLeadingLeptonIso_cfi import *
 
-boostedTauLeadingLeptonIso.boostedTauCollection  = cms.InputTag("slimmedTausBoosted")
+boostedTauLeadingLeptonIso.boostedTauCollection  = cms.InputTag("slimmedTausBoostedNewID")
 boostedTauLeadingLeptonIso.muonCollection  = cms.InputTag("slimmedMuonsUpdated")
 from RecoTauTag.RecoTau.tauIdWPsDefs import WORKING_POINTS_v2p7
 #Import from the user defined plugins
@@ -32,7 +32,7 @@ run2_nanoAOD_106Xv2.toModify(
 #Changes by Ganesh for Custom nanoAOD production
 
 slimmedboostedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
-     src = cms.InputTag("slimmedTausBoosted"),
+     src = cms.InputTag("slimmedTausBoostedNewID"),
      userFloats = cms.PSet(
         #ForEtauSumChargedHadronPt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumChargedHadronPt"),
         #ForEtauSumPhotonEt = cms.InputTag("BoostedTauIsoCorrectionTool:ForEtauSumPhotonEt"),
@@ -347,15 +347,17 @@ boostedTauMCTable = tauMCTable.clone(
 
 #Changes by Ganesh for nanoAOD production
 #boostedTauTask = cms.Task(finalBoostedTaus)
-boostedTauTask = cms.Task(boostedTauLeadingLeptonIso + slimmedboostedTauWithUserData + finalBoostedTaus)
+#boostedTauSequence = cms.Sequence(boostedTauLeadingLeptonIso + slimmedboostedTauWithUserData + finalBoostedTaus)
+boostedTauTask = cms.Task(boostedTauLeadingLeptonIso,slimmedboostedTauWithUserData,finalBoostedTaus)
+#boostedTauTask = cms.Task(boostedTauSequence)
 boostedTauTablesTask = cms.Task(boostedTauTable)
 boostedTauMCTask = cms.Task(boostedTausMCMatchLepTauForTable,boostedTausMCMatchHadTauForTable,boostedTauMCTable)
 
 #remove boosted tau from previous eras
-(run3_nanoAOD_122).toReplaceWith(
-    boostedTauTask,cms.Task()
-).toReplaceWith(
-    boostedTauTablesTask,cms.Task()
-).toReplaceWith(
-    boostedTauMCTask,cms.Task()
-)
+#(run3_nanoAOD_122).toReplaceWith(
+#    boostedTauTask,cms.Task()
+#).toReplaceWith(
+#    boostedTauTablesTask,cms.Task()
+#).toReplaceWith(
+#    boostedTauMCTask,cms.Task()
+#)
