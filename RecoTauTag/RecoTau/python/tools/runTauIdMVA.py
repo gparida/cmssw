@@ -22,7 +22,7 @@ class TauIDEmbedder(object):
                  originalTauName = "slimmedTaus",
                  updatedTauName = "slimmedTausNewID",
                  postfix = "",
-                 toKeep =  ["deepTau2017v2p1", "deepTau2018v2p5", "deepTau2026v2p5"],
+                 toKeep =  ["deepTau2017v2p1", "deepTau2018v2p5", "deepTau2026v2p5","deepTau2018v2p7"],
                  tauIdDiscrMVA_trainings_run2_2017 = { 'tauIdMVAIsoDBoldDMwLT2017' : "tauIdMVAIsoDBoldDMwLT2017", },
                  tauIdDiscrMVA_WPs_run2_2017 = {
                     'tauIdMVAIsoDBoldDMwLT2017' : {
@@ -667,6 +667,7 @@ class TauIDEmbedder(object):
                 sub_version                     = full_version[2],
                 disable_dxy_pca                 = True,
                 disable_hcalFraction_workaround = True,
+                save_inputs                     = False,
                 disable_CellIndex_workaround    = True
             ))
 
