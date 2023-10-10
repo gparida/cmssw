@@ -1611,7 +1611,7 @@ private:
     if (sub_version_ == 1)
       get(dnn::footprintCorrection) =
           sp.scale(tau_funcs.getFootprintCorrectiondR03(tau, tau_ref), tauInputs_indices_[dnn::footprintCorrection]);
-    else if (sub_version_ == 5)
+    else if ((sub_version_ == 5) || (sub_version_ == 7))
       get(dnn::footprintCorrection) =
           sp.scale(tau_funcs.getFootprintCorrection(tau, tau_ref), tauInputs_indices_[dnn::footprintCorrection]);
 
@@ -1665,13 +1665,32 @@ private:
                    tauInputs_indices_[dnn::tau_ip3d_sig]);
     }
     if (leadChargedHadrCand) {
+      //byGanesh for Debugging
       const bool hasTrackDetails = candFunc::getHasTrackDetails(*leadChargedHadrCand);
       const float tau_dz = (is_online_ && !hasTrackDetails) ? 0 : candFunc::getTauDz(*leadChargedHadrCand);
       get(dnn::tau_dz) = sp.scale(tau_dz, tauInputs_indices_[dnn::tau_dz]);
+      /*std::cout<<"\n"<<"\n";
+      std::cout<<"This is btau index = "<<tau_index<<"\n";
+      std::cout<<"This is is_online_ = "<<is_online_<<"\n";
+      std::cout<<"hasTrackDetails = "<<hasTrackDetails<<"\n";*/
+      /*if (hasTrackDetails){
+      std::cout<<"getTauDz(*leadChargedHadrCand) = "<<candFunc::getTauDz(*leadChargedHadrCand)<<"\n";
+      std::cout<<"tau_dz_sig_valid = "<<sp.scale(candFunc::getTauDZSigValid(*leadChargedHadrCand), tauInputs_indices_[dnn::tau_dz_sig_valid])<<"\n";
+      std::cout<<"Stuff used for dZ computation "<<"\n";
+      std::cout<<"leadChargedHadrCand_dzError = "<<leadChargedHadrCand->dzError()<<"\n";
+      }
+      else
+      { //std::cout<<"float tau_dz = "<<tau_dz<<" get(dnn::tau_dz) = "<<sp.scale(tau_dz, tauInputs_indices_[dnn::tau_dz])<<"\n";
+        std::cout<<"non scaled tau_dz = "<<tau_dz<<" scaled get(dnn::tau_dz) = "<<sp.scale(tau_dz, tauInputs_indices_[dnn::tau_dz])<<"\n";}*/
+
       get(dnn::tau_dz_sig_valid) =
           sp.scale(candFunc::getTauDZSigValid(*leadChargedHadrCand), tauInputs_indices_[dnn::tau_dz_sig_valid]);
       const double dzError = hasTrackDetails ? leadChargedHadrCand->dzError() : -999.;
       get(dnn::tau_dz_sig) = sp.scale(std::abs(tau_dz) / dzError, tauInputs_indices_[dnn::tau_dz_sig]);
+      /*std::cout<<"tau_dz_sig_valid = "<<sp.scale(candFunc::getTauDZSigValid(*leadChargedHadrCand), tauInputs_indices_[dnn::tau_dz_sig_valid])<<"\n";
+      std::cout<<"dzError = "<<dzError<<"\n";
+      std::cout<<"non scaled tau_dz_sig = "<<(std::abs(tau_dz) / dzError)<<" Scaled Value = "<<sp.scale(std::abs(tau_dz) / dzError, tauInputs_indices_[dnn::tau_dz_sig])<<"\n";
+      std::cout<<"\n"<<"\n";*/
     }
     get(dnn::tau_flightLength_x) =
         sp.scale(tau_funcs.getFlightLength(tau, tau_index).x(), tauInputs_indices_[dnn::tau_flightLength_x]);
@@ -1681,7 +1700,7 @@ private:
         sp.scale(tau_funcs.getFlightLength(tau, tau_index).z(), tauInputs_indices_[dnn::tau_flightLength_z]);
     if (sub_version_ == 1)
       get(dnn::tau_flightLength_sig) = 0.55756444;  //This value is set due to a bug in the training
-    else if (sub_version_ == 5)
+    else if ((sub_version_ == 5) || (sub_version_ == 7))
       get(dnn::tau_flightLength_sig) =
           sp.scale(tau_funcs.getFlightLengthSig(tau, tau_index), tauInputs_indices_[dnn::tau_flightLength_sig]);
 
@@ -1743,7 +1762,7 @@ private:
     // to account for swapped order of PfCand_gamma and Electron blocks for v2p5 training w.r.t. v2p1
     int fill_index_offset_e = 0;
     int fill_index_offset_PFg = 0;
-    if (sub_version_ == 5) {
+    if ((sub_version_ == 5) || (sub_version_ == 7)) {
       fill_index_offset_e =
           scalingParamsMap_->at(std::make_pair(ft_PFg, false)).mean_.size();  // size of PF gamma features
       fill_index_offset_PFg =
