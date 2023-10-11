@@ -37,6 +37,16 @@ run2_nanoAOD_106Xv2.toModify(
 slimmedboostedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
      src = cms.InputTag("slimmedTausBoostedNewID"),
      userFloats = cms.PSet(
+
+        LeadingElectrondelR = cms.InputTag("boostedTauLeadingLeptonIso:LeadingElectrondelR"),
+        SubLeadingElectrondelR = cms.InputTag("boostedTauLeadingLeptonIso:SubLeadingElectrondelR"),
+        SubSubLeadingElectrondelR = cms.InputTag("boostedTauLeadingLeptonIso:SubSubLeadingElectrondelR"),
+        LeadingMuondelR = cms.InputTag("boostedTauLeadingLeptonIso:LeadingMuondelR"),
+        SubLeadingMuondelR = cms.InputTag("boostedTauLeadingLeptonIso:SubLeadingMuondelR"),
+        SubSubLeadingMuondelR = cms.InputTag("boostedTauLeadingLeptonIso:SubSubLeadingMuondelR"),
+
+
+
         LeadingElectronPt = cms.InputTag("boostedTauLeadingLeptonIso:LeadingElectronPt"),
         LeadingElectronEta = cms.InputTag("boostedTauLeadingLeptonIso:LeadingElectronEta"),
         LeadingElectronPhi = cms.InputTag("boostedTauLeadingLeptonIso:LeadingElectronPhi"),
@@ -144,6 +154,15 @@ _boostedTauVarsBase = cms.PSet(P4Vars,
        leadTkDeltaPhi = Var("deltaPhi(leadChargedHadrCand.phi, phi) ",float, doc="phi of the leading track, minus tau phi",precision=8),
 
        #variables added by Ganesh for Electron-Match
+
+       #add DelR
+       LeadingElectrondelR = Var("userFloat('LeadingElectrondelR')",float,doc="Leading Matched Electron delR"),
+       SubLeadingElectrondelR = Var("userFloat('SubLeadingElectrondelR')",float,doc="Sub Leading Matched Electron delR"),      
+       SubSubLeadingElectrondelR =  Var("userFloat('SubSubLeadingElectrondelR')",float,doc="Sub Sub Leading Matched Electron delR"),
+       LeadingMuondelR = Var("userFloat('LeadingMuondelR')",float,doc="Leading Matched Muon delR"),
+       SubLeadingMuondelR = Var("userFloat('SubLeadingMuondelR')",float,doc="Sub Leading Matched Muon delR"),
+       SubSubLeadingMuondelR = Var("userFloat('SubSubLeadingMuondelR')",float,doc="Sub-Sub Leading Matched Muon delR"),
+
        Ecounter = Var("userInt('Ecounter')",int,doc="Number of electrons that passed & matched with Tau and has the Loose ID and the delta R < 0.4 and > 0.02 requirements. Sadly we only store 3 leading"),
 
        LeadingElectronPt = Var("userFloat('LeadingElectronPt')",float,doc="Leading Matched Electron Pt"),
