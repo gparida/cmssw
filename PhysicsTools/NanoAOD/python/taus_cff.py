@@ -43,6 +43,14 @@ run3_nanoAOD_124.toModify(
 slimmedTauWithUserData = cms.EDProducer("PATTauUserDataEmbedder",
      src = cms.InputTag("slimmedTausUpdatedWithPNet"),
      userFloats = cms.PSet(
+
+        LeadingElectrondelR = cms.InputTag("TauLeadingLeptonIso:LeadingElectrondelR"),
+        SubLeadingElectrondelR = cms.InputTag("TauLeadingLeptonIso:SubLeadingElectrondelR"),
+        SubSubLeadingElectrondelR = cms.InputTag("TauLeadingLeptonIso:SubSubLeadingElectrondelR"),
+        LeadingMuondelR = cms.InputTag("TauLeadingLeptonIso:LeadingMuondelR"),
+        SubLeadingMuondelR = cms.InputTag("TauLeadingLeptonIso:SubLeadingMuondelR"),
+        SubSubLeadingMuondelR = cms.InputTag("TauLeadingLeptonIso:SubSubLeadingMuondelR"),
+
         LeadingElectronPt = cms.InputTag("TauLeadingLeptonIso:LeadingElectronPt"),
         LeadingElectronEta = cms.InputTag("TauLeadingLeptonIso:LeadingElectronEta"),
         LeadingElectronPhi = cms.InputTag("TauLeadingLeptonIso:LeadingElectronPhi"),
@@ -176,7 +184,18 @@ _tauVarsBase = cms.PSet(P4Vars,
        idDecayModeNewDMs = Var("(?isTauIDAvailable('decayModeFindingNewDMs')?tauID('decayModeFindingNewDMs'):-1) > 0", bool),
 
        #Changes made by Ganesh
+
+       #add DelR
+       LeadingElectrondelR = Var("userFloat('LeadingElectrondelR')",float,doc="Leading Matched Electron delR"),
+       SubLeadingElectrondelR = Var("userFloat('SubLeadingElectrondelR')",float,doc="Sub Leading Matched Electron delR"),      
+       SubSubLeadingElectrondelR =  Var("userFloat('SubSubLeadingElectrondelR')",float,doc="Sub Sub Leading Matched Electron delR"),
+       LeadingMuondelR = Var("userFloat('LeadingMuondelR')",float,doc="Leading Matched Muon delR"),
+       SubLeadingMuondelR = Var("userFloat('SubLeadingMuondelR')",float,doc="Sub Leading Matched Muon delR"),
+       SubSubLeadingMuondelR = Var("userFloat('SubSubLeadingMuondelR')",float,doc="Sub-Sub Leading Matched Muon delR"),
+
+
        Ecounter = Var("userInt('Ecounter')",int,doc="Number of electrons that passed & matched with taus and has the Loose ID and the delta R < 0.4 and > 0.02 requirements. We sadly store only leading 3"),
+
 
        LeadingElectronPt = Var("userFloat('LeadingElectronPt')",float,doc="Leading Matched Electron Pt"),
        LeadingElectronEta = Var("userFloat('LeadingElectronEta')",float,doc="Leading Matched Electron eta"),
