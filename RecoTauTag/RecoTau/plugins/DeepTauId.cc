@@ -961,7 +961,7 @@ public:
                                         static_cast<int>(TauBlockInputs::varsToDrop.size())});
         if (year_ == 2026) {
           scalingParamsMap_ = &sc::scalingParamsMap_PhaseIIv2p5;
-        }else if (sub_version_ == 7){std::cout<<"Pikcking up BoostedTau Params File"<<std::endl; scalingParamsMap_ = &sc::scalingParamsMap_v2p7;} 
+        }else if (sub_version_ == 7){std::cout<<"Picking up BoostedTau Parameter Scaling File"<<std::endl; scalingParamsMap_ = &sc::scalingParamsMap_v2p7;} 
         else {
           scalingParamsMap_ = &sc::scalingParamsMap_v2p5;
         }
