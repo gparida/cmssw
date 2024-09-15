@@ -939,9 +939,9 @@ class TauIDEmbedder(object):
             workingPoints_ = WORKING_POINTS_20161718_v2p0
 
             file_names = [
-                'core:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_core.pb',
-                'inner:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_inner.pb',
-                'outer:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_outer.pb',
+                'core:RecoTauTag/TrainingFiles/data/BoostedDeepTauId/boosteddeepTau_RunIIv2p0_core.pb',
+                'inner:RecoTauTag/TrainingFiles/data/BoostedDeepTauId/boosteddeepTau_RunIIv2p0_inner.pb',
+                'outer:RecoTauTag/TrainingFiles/data/BoostedDeepTauId/boosteddeepTau_RunIIv2p0_outer.pb',
             ]
             #full_version = self.getDeepTauVersion(file_names[0])
             setattr(self.process,_deepTauName+self.postfix,DeepTau.clone(
