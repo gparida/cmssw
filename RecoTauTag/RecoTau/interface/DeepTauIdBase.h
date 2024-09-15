@@ -1074,7 +1074,7 @@ public:
 
       if (sub_version_ == 1) {
         scalingParamsMap_ = &sc::scalingParamsMap_v2p1;
-      } else if (sub_version_ == 5) {
+      } else if ((sub_version_ == 5) || ((sub_version_ == 0) && (year_ == 20161718))) {
         std::sort(TauBlockInputs::varsToDrop.begin(), TauBlockInputs::varsToDrop.end());
         for (auto v : TauBlockInputs::varsToDrop) {
           tauInputs_indices_.at(v) = TauBlockInputs::NumberOfInputs - TauBlockInputs::varsToDrop.size();
@@ -1083,7 +1083,8 @@ public:
         }
         if (year_ == 2026) {
           scalingParamsMap_ = &sc::scalingParamsMap_PhaseIIv2p5;
-        } else {
+        }else if ((sub_version_ == 0) && (year_ == 20161718)){std::cout<<"Picking up BoostedDeepTauv2p0 params feature scaling File "<<std::endl; scalingParamsMap_ = &sc::scalingParamsMap_20161718_v2p0;}  
+        else {
           scalingParamsMap_ = &sc::scalingParamsMap_v2p5;
         }
       } else
@@ -1298,7 +1299,7 @@ protected:
     if (sub_version_ == 1)
       get(dnn::footprintCorrection) =
           sp.scale(tau_funcs.getFootprintCorrectiondR03(tau, tau_ref), tauInputs_indices_[dnn::footprintCorrection]);
-    else if (sub_version_ == 5) {
+    else if ((sub_version_ == 5) || ((sub_version_ == 0) && (year_==20161718))) {
       if (is_online_)
         get(dnn::footprintCorrection) =
             sp.scale(tau_funcs.getFootprintCorrectiondR03(tau, tau_ref), tauInputs_indices_[dnn::footprintCorrection]);
@@ -1372,7 +1373,7 @@ protected:
         sp.scale(tau_funcs.getFlightLength(tau, tau_index).z(), tauInputs_indices_[dnn::tau_flightLength_z]);
     if (sub_version_ == 1)
       get(dnn::tau_flightLength_sig) = 0.55756444;  //This value is set due to a bug in the training
-    else if (sub_version_ == 5)
+    else if ((sub_version_ == 5) || ((sub_version_ == 0) && (year_==20161718)))
       get(dnn::tau_flightLength_sig) =
           sp.scale(tau_funcs.getFlightLengthSig(tau, tau_index), tauInputs_indices_[dnn::tau_flightLength_sig]);
 
@@ -1436,7 +1437,7 @@ protected:
     // to account for swapped order of PfCand_gamma and Electron blocks for v2p5 training w.r.t. v2p1
     int fill_index_offset_e = 0;
     int fill_index_offset_PFg = 0;
-    if (sub_version_ == 5) {
+    if ((sub_version_ == 5) || ((sub_version_ == 0) && (year_==20161718))) {
       fill_index_offset_e =
           scalingParamsMap_->at(std::make_pair(ft_PFg, false)).mean_.size();  // size of PF gamma features
       fill_index_offset_PFg =

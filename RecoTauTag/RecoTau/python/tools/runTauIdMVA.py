@@ -4,7 +4,8 @@ from RecoTauTag.RecoTau.TauDiscriminatorTools import noPrediscriminants
 from RecoTauTag.RecoTau.PATTauDiscriminationByMVAIsolationRun2_cff import patDiscriminationByIsolationMVArun2v1raw, patDiscriminationByIsolationMVArun2v1
 from RecoTauTag.RecoTau.DeepTau_cfi import DeepTau
 from RecoTauTag.RecoTau.DeepTauIdSonicProducer_cfi import DeepTauIdSonicProducer
-from RecoTauTag.RecoTau.tauIdWPsDefs import WORKING_POINTS_v2p1, WORKING_POINTS_v2p5, WORKING_POINTS_PHASEII_v2p5
+from RecoTauTag.RecoTau.tauIdWPsDefs import WORKING_POINTS_v2p1, WORKING_POINTS_v2p5, WORKING_POINTS_PHASEII_v2p5, WORKING_POINTS_20161718_v2p0
+
 
 import os
 import re
@@ -21,14 +22,14 @@ class TauIDEmbedder(object):
         "againstEle", #payloads from GT (2018)
         "newDMPhase2v1", #payloads from phase2 GT
         "againstElePhase2v1", #payloads from phase2 GT
-        "deepTau2017v2", "deepTau2017v2p1", "deepTau2018v2p5", "deepTau2026v2p5"
+        "deepTau2017v2", "deepTau2017v2p1", "deepTau2018v2p5","boosteddeepTau2018v2p0","deepTau2026v2p5"
     ])
 
     def __init__(self, process, debug = False,
                  originalTauName = "slimmedTaus",
                  updatedTauName = "slimmedTausNewID",
                  postfix = "",
-                 toKeep =  ["deepTau2017v2p1", "deepTau2018v2p5", "deepTau2026v2p5"],
+                 toKeep =  ["deepTau2017v2p1", "deepTau2018v2p5", "deepTau2026v2p5","boosteddeepTau2018v2p0"],
                  conditionDB = "" # preparational DB: 'frontier://FrontierPrep/CMS_CONDITIONS'
                  ):
         super(TauIDEmbedder, self).__init__()
@@ -929,6 +930,42 @@ class TauIDEmbedder(object):
 
             _rerunMvaIsolationTask.add(_deepTauProducer)
             _rerunMvaIsolationSequence += _deepTauProducer
+
+#Adding BoostedDeepTau v2p0 IDs for boostedTaus 
+        if "boosteddeepTau2018v2p0" in self.toKeep:
+            if self.debug: print ("Adding BoostedDeepTau v2p0 IDs for boostedTaus")
+
+            _deepTauName = "boosteddeepTau20161718v2p0"
+            workingPoints_ = WORKING_POINTS_20161718_v2p0
+
+            file_names = [
+                'core:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_core.pb',
+                'inner:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_inner.pb',
+                'outer:RecoTauTag/TrainingFiles/data/DeepTauId/boosteddeepTau_RunIIv2p0_outer.pb',
+            ]
+            #full_version = self.getDeepTauVersion(file_names[0])
+            setattr(self.process,_deepTauName+self.postfix,DeepTau.clone(
+                Prediscriminants                = noPrediscriminants,
+                taus                            = self.originalTauName,
+                graph_file                      = file_names,
+                #year                            = full_version[0],
+                year                            = int(20161718), 
+                #version                         = full_version[1],
+                version                         = int(2),
+                #sub_version                     = full_version[2],
+                sub_version                     = int(0),
+                disable_dxy_pca                 = True,
+                disable_hcalFraction_workaround = True,
+                save_inputs                     = False,
+                disable_CellIndex_workaround    = True
+            ))
+
+            self.processDeepProducer(_deepTauName, tauIDSources, workingPoints_)
+
+            _deepTauProducer = getattr(self.process,_deepTauName+self.postfix)
+            _rerunMvaIsolationTask.add(_deepTauProducer)
+            _rerunMvaIsolationSequence += _deepTauProducer
+#End of changes for boostedTaus
 
         if "deepTau2026v2p5" in self.toKeep:
             if self.debug: print ("Adding Phase2 DeepTau v2p5 IDs")
